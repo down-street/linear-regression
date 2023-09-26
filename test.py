@@ -26,6 +26,7 @@ for i in range(0, 100):
 # Y = [yy[0] for yy in y]
 # fig, ax = plt.subplots()
 # ax.scatter(X, Y)
+#print(x,y)
 
 for i in range(0, 5000):
     model.train_for_one_epoch(np.array(x), np.array(y))

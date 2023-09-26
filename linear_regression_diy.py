@@ -37,8 +37,11 @@ class Parameter(object):
         assert len(shape) == 2, "Expected a two-dimension shape, got {}".format(len(shape))
         # 初始化参数
         limit = np.sqrt(3.0 / np.mean(shape))
-        self.data = np.random.uniform(low=-limit, high=limit, size=shape)
+        self.data = np.random.uniform(low=-limit, high=limit, size=shape) 
+        
 
     def update(self, alpha, gradient):
         assert gradient.shape == self.data.shape, "Expected gradient shape {}, got {}".format(self.data.shape, gradient.shape)
         self.data = self.data - alpha * gradient
+        #print(gradient)
+       
