@@ -2,12 +2,12 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 # 1. 读取数据集 https://www.kaggle.com/datasets/mirichoi0218/insurance
-data = pd.read_csv('insurance.csv')
+data = pd.read_csv('adm_data.csv')
 
 # 2. 数据预处理
 # 2.1 检查表格是否有缺失值，如果有则用该列数据平均值代替
@@ -16,11 +16,11 @@ if data.isnull().any().any():
     data.fillna(data.mean(), inplace=True)
 
 # 2.2 独热编码分类特征
-data = pd.get_dummies(data, columns=['sex', 'smoker', 'region'], drop_first=True)
+data = pd.get_dummies(data, columns=['Research'], drop_first=True)
 
 # 2.3 数据规范化（标准化）
 scaler = StandardScaler()
-data[['age', 'bmi', 'children', 'charges']] = scaler.fit_transform(data[['age', 'bmi', 'children', 'charges']])
+data[['GRE Score','TOEFL Score','University Rating','SOP','LOR','CGPA']] = scaler.fit_transform(data[['GRE Score','TOEFL Score','University Rating','SOP','LOR','CGPA']])
 
 # 2.4 检查并处理同名列
 if data.columns.duplicated().any():
@@ -28,8 +28,8 @@ if data.columns.duplicated().any():
     data.columns = [col if data.columns.get_loc(col) == idx else col + f'_{idx}' for idx, col in enumerate(data.columns)]
 
 # 3. 准备数据集
-X = data.drop('charges', axis=1)  # 特征
-y = data['charges']  # 目标变量
+X = data.drop('Chance of Admit', axis=1)  # 特征
+y = data['Chance of Admit']  # 目标变量
 
 # 4. 拆分数据集为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -65,22 +65,22 @@ plt.show()
 # 9. 识别和移除异常值，即数据清洗
 # 使用箱线图来识别异常值
 plt.figure(figsize=(12, 6))
-sns.boxplot(data=data[['age', 'bmi', 'children', 'charges']], orient="h")
+sns.boxplot(data=data[['GRE Score','TOEFL Score','University Rating','SOP','LOR','CGPA']], orient="h")
 plt.title('Box Plot of Features')
 plt.savefig('box_plot.png')
 plt.show()
 
-# 识别并移除 'charges' 列中的异常值
-Q1 = data['charges'].quantile(0.25)
-Q3 = data['charges'].quantile(0.75)
+# 识别并移除 'Chance of Admit' 列中的异常值
+Q1 = data['Chance of Admit'].quantile(0.25)
+Q3 = data['Chance of Admit'].quantile(0.75)
 IQR = Q3 - Q1
 lower_bound = Q1 - 1.5 * IQR
 upper_bound = Q3 + 1.5 * IQR
-data = data[(data['charges'] >= lower_bound) & (data['charges'] <= upper_bound)]
+data = data[(data['Chance of Admit'] >= lower_bound) & (data['Chance of Admit'] <= upper_bound)]
 
 # 重新准备数据集，移除异常值后的数据
-X = data.drop('charges', axis=1)  # 特征
-y = data['charges']  # 目标变量
+X = data.drop('Chance of Admit', axis=1)  # 特征
+y = data['Chance of Admit']  # 目标变量
 
 # 重新拆分数据集为训练集和测试集
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -126,6 +126,8 @@ plt.show()
 # 12. 计算平均绝对误差（MAE）和均方误差（MSE）
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
 
 print("平均绝对误差（MAE）:", mae)
 print("均方误差（MSE）:", mse)
+print("决定系数（R^2）:", r2)
