@@ -1,0 +1,7 @@
+# 不保存pycache
+/__pycache__
+
+# 不保存图片
+*.png
+*.jpg
+*.svg

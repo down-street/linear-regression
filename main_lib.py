@@ -65,15 +65,15 @@ df = pd.read_csv('concrete_data.csv')
 df = df.drop_duplicates()
 
 # EDA过程
-skewed_cols = ['Cement','Blast Furnace Slag','Water','Superplasticizer','Fine Aggregate','Age','Strength','Fly Ash','Coarse Aggregate']
-for col in skewed_cols:
-    apply_transform(PowerTransformer(),col)
-for col in skewed_cols:
-    apply_transform(FunctionTransformer(np.log1p),col)
-for col in skewed_cols:
-    apply_transform(FunctionTransformer(np.sqrt),col)
-for col in skewed_cols:
-    apply_transform(FunctionTransformer(lambda x: x**2),col)
+# skewed_cols = ['Cement','Blast Furnace Slag','Water','Superplasticizer','Fine Aggregate','Age','Strength','Fly Ash','Coarse Aggregate']
+# for col in skewed_cols:
+#     apply_transform(PowerTransformer(),col)
+# for col in skewed_cols:
+#     apply_transform(FunctionTransformer(np.log1p),col)
+# for col in skewed_cols:
+#     apply_transform(FunctionTransformer(np.sqrt),col)
+# for col in skewed_cols:
+#     apply_transform(FunctionTransformer(lambda x: x**2),col)
 
 
 X = df.drop('Strength',axis=1)
@@ -101,16 +101,16 @@ final_X_test_tf = scaler.transform(final_X_test_tf)
 final_X_test_tf = pd.DataFrame(final_X_test_tf,columns=features)
 
 # PCA降维
-pca = PCA(n_components=0.95) 
-final_X_train_pca = pca.fit_transform(final_X_train_tf)
-final_X_test_pca = pca.transform(final_X_test_tf)
-final_X_train_pca = pd.DataFrame(final_X_train_pca)
-final_X_test_pca = pd.DataFrame(final_X_test_pca)
+# pca = PCA(n_components=0.95) 
+# final_X_train_pca = pca.fit_transform(final_X_train_tf)
+# final_X_test_pca = pca.transform(final_X_test_tf)
+# final_X_train_pca = pd.DataFrame(final_X_train_pca)
+# final_X_test_pca = pd.DataFrame(final_X_test_pca)
 
-final_train = final_X_train_pca
-final_test = final_X_test_pca
+# final_train = final_X_train_pca
+# final_test = final_X_test_pca
 
-# final_train = final_X_train_tf
-# final_test = final_X_test_tf
+final_train = final_X_train_tf
+final_test = final_X_test_tf
 
 train_and_evaluate_model(LinearRegression())

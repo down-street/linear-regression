@@ -1,6 +1,6 @@
 import numpy as np
 
-class MyModel:
+class LinearRegression(object):
     def __init__(self):
         self.coef_ = None  # 回归系数
         self.intercept_ = None  # 截距
