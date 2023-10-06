@@ -20,7 +20,7 @@ class LinearRegression(object):
         x = x.to_numpy()
         y = y.to_numpy().reshape(-1, 1)
 
-        for i in range(0, x.shape[0] // self.batch_size * 1000):
+        for i in range(0, x.shape[0] // self.batch_size * 100):
             # 随机生成小批量数据
             batch_indices = np.random.choice(x.shape[0], self.batch_size, replace=False)
             
