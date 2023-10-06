@@ -2,29 +2,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import warnings, gc, joblib
-# warnings.filterwarnings('ignore')
-# from sklearnex import patch_sklearn
-# patch_sklearn()
-from sklearn.model_selection import train_test_split, RandomizedSearchCV, cross_val_score
+import gc
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, PowerTransformer, FunctionTransformer
 from sklearn.metrics import r2_score, mean_absolute_percentage_error, mean_squared_error
-from sklearn.linear_model import LinearRegression, PassiveAggressiveRegressor, Lasso, Ridge, ElasticNet, HuberRegressor, ARDRegression, RANSACRegressor, TweedieRegressor, PoissonRegressor, BayesianRidge, SGDRegressor, GammaRegressor, TheilSenRegressor
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.svm import SVR, NuSVR, LinearSVR
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor, BaggingRegressor, AdaBoostRegressor, GradientBoostingRegressor, HistGradientBoostingRegressor, VotingRegressor, StackingRegressor
-from sklearn.neural_network import MLPRegressor
-from xgboost import XGBRegressor, XGBRFRegressor
-# from catboost import CatBoostRegressor
-# from lightgbm import LGBMRegressor
+from sklearn.linear_model import SGDRegressor, LinearRegression
 from scipy.stats import probplot
-from sklearn.feature_selection import SelectKBest, SelectPercentile, SelectFromModel, f_regression, RFE, SequentialFeatureSelector
 from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import PolynomialFeatures
-# from feature_engine.outliers import Winsorizer
-# from sklearn.pipeline import Pipeline
+
 
 def apply_transform(transformer,col):
     plt.figure(figsize=(14,4))
@@ -56,6 +42,7 @@ def train_and_evaluate_model(model):
     r2 = r2_score(y_test,y_pred)
     rmse = mean_squared_error(y_test,y_pred,squared=False)
     mape = mean_absolute_percentage_error(y_test,y_pred)
+    plot_y.append(r2)
     print("R2 Score:",r2)
     print("RMSE:",rmse)
     print("MAPE:",mape)
@@ -74,7 +61,6 @@ df = df.drop_duplicates()
 #     apply_transform(FunctionTransformer(np.sqrt),col)
 # for col in skewed_cols:
 #     apply_transform(FunctionTransformer(lambda x: x**2),col)
-
 
 X = df.drop('Strength',axis=1)
 y = df['Strength']
@@ -101,11 +87,11 @@ final_X_test_tf = scaler.transform(final_X_test_tf)
 final_X_test_tf = pd.DataFrame(final_X_test_tf,columns=features)
 
 # PCA降维
-# pca = PCA(n_components=0.95) 
-# final_X_train_pca = pca.fit_transform(final_X_train_tf)
-# final_X_test_pca = pca.transform(final_X_test_tf)
-# final_X_train_pca = pd.DataFrame(final_X_train_pca)
-# final_X_test_pca = pd.DataFrame(final_X_test_pca)
+pca = PCA(n_components=0.95) 
+final_X_train_pca = pca.fit_transform(final_X_train_tf)
+final_X_test_pca = pca.transform(final_X_test_tf)
+final_X_train_pca = pd.DataFrame(final_X_train_pca)
+final_X_test_pca = pd.DataFrame(final_X_test_pca)
 
 # final_train = final_X_train_pca
 # final_test = final_X_test_pca
@@ -113,4 +99,29 @@ final_X_test_tf = pd.DataFrame(final_X_test_tf,columns=features)
 final_train = final_X_train_tf
 final_test = final_X_test_tf
 
-train_and_evaluate_model(LinearRegression())
+#train_and_evaluate_model(LinearRegression())
+nums = np.linspace(0.00005, 0.1, 500)
+plot_x = []
+plot_y = []
+for i in range(500):
+    plot_x.append(nums[i])
+    train_and_evaluate_model(SGDRegressor(penalty='l1', alpha=nums[i]))
+
+plt.plot(plot_x, plot_y)
+plt.xlabel('l1') 
+plt.ylabel('r2')
+plt.legend()
+plt.grid() 
+plt.show()
+
+plot_x = []
+plot_y = []
+for i in range(500):
+    plot_x.append(nums[i])
+    train_and_evaluate_model(SGDRegressor(penalty='l2', alpha=nums[i]))
+plt.plot(plot_x, plot_y)
+plt.xlabel('l2') 
+plt.ylabel('r2')
+plt.legend()
+plt.grid() 
+plt.show()
